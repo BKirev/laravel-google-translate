@@ -52,19 +52,19 @@ class GoogleTranslate
         return $translations;
     }
 
-    public function translate($input, $to = null): array
+    public function translate($input, $to = null, $format = 'text'): array
     {
         $translateTo = $to ?? config('googletranslate.default_target_translation');
 
         $translateTo = $this->sanitizeLanguageCode($translateTo);
 
         if (is_array($input)) {
-            return $this->translateBatch($input, $translateTo);
+            return $this->translateBatch($input, $translateTo, $format);
         }
 
         $response = $this
             ->translateClient
-            ->translate($input, $translateTo);
+            ->translate($input, $translateTo, $format);
 
         return [
             'source_text' => $input,
@@ -74,7 +74,7 @@ class GoogleTranslate
         ];
     }
 
-    public function justTranslate(string $input, $to = null): string
+    public function justTranslate(string $input, $to = null, $format = 'text'): string
     {
         $translateTo = $to ?? config('googletranslate.default_target_translation');
 
@@ -82,18 +82,18 @@ class GoogleTranslate
 
         $response = $this
             ->translateClient
-            ->translate($input, $translateTo);
+            ->translate($input, $translateTo, $format);
 
         return $response['text'];
     }
 
-    public function translateBatch(array $input, string $translateTo): array
+    public function translateBatch(array $input, string $translateTo, $format = 'text'): array
     {
         $translateTo = $this->sanitizeLanguageCode($translateTo);
 
         $responses = $this
             ->translateClient
-            ->translateBatch($input, $translateTo);
+            ->translateBatch($input, $translateTo, $format);
 
         foreach ($responses as $response) {
             $translations[] = [
@@ -115,7 +115,7 @@ class GoogleTranslate
             ->getAvaliableTranslationsFor($languageCode);
     }
 
-    public function unlessLanguageIs(string $languageCode, string $input, $to = null)
+    public function unlessLanguageIs(string $languageCode, string $input, $to = null, $format = 'text')
     {
         $translateTo = $to ?? config('googletranslate.default_target_translation');
 
@@ -126,7 +126,7 @@ class GoogleTranslate
         $languageMisMatch = $languageCode != $this->detectLanguage($input)['language_code'];
 
         if ($languageMisMatch) {
-            return $this->translate($input, $translateTo);
+            return $this->translate($input, $translateTo, $format);
         }
 
         return $input;

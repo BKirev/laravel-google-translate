@@ -136,6 +136,10 @@ class GoogleTranslate
     {
         $languageCode = trim(strtolower($languageCode));
 
+        if ($languageCode === 'zh-tw') {
+            $languageCode = 'zh-TW';
+        }
+        
         if (in_array($languageCode, $this->languages())) {
             return $languageCode;
         }
